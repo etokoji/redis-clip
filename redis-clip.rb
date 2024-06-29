@@ -19,8 +19,14 @@ end
 
 def clip_to_redis
   text = Clipboard.paste
-  $redis.set('clipboard', text)
-  puts "redisに '#{text}' をコピーしました"
+  puts text
+  # textをUTF-8に変換 (変換できない文字は置換)
+  #text_utf8 = text.encode('UTF-8', 'Shift_JIS', invalid: :replace, replace: '?')
+  text_utf8 = text.encode('UTF-8', invalid: :replace, replace: '?')
+  puts text_utf8
+
+  $redis.set('clipboard', text_utf8)
+  puts "redisに '#{text_utf8}' をコピーしました"
 end
 
 # ペースト関数
@@ -32,6 +38,11 @@ def redis_to_clipboard
   else
     puts 'クリップボードが空です'
   end
+end
+
+def get_redis_clip
+  data = $redis.get(RedisKey)
+  puts data
 end
 
 # # 使用例
